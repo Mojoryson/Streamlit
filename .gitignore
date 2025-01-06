@@ -3,6 +3,7 @@ config.py
 *pycache*
 *checkpoints*
 *.pdf
+notes.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
