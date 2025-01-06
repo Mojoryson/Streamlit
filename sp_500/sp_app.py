@@ -47,35 +47,39 @@ def file_download(df):
 
 st.markdown(file_download(df_selected_sector), unsafe_allow_html=True)
 
-# Pull thes stock data from yfinance
-data = yf.download(
-        tickers = list(df_selected_sector[:10].Symbol),
-        period = "ytd",
-        interval = "1d",
-        group_by = "ticker",
-        auto_adjust = True,
-        prepost = True,
-        threads = True,
-        proxy = None
-)
+if not df_selected_sector.empty:
 
-# Plot the closing price of the selected companies
+        # Pull thes stock data from yfinance
+        data = yf.download(
+                tickers = list(df_selected_sector[:10].Symbol),
+                period = "ytd",
+                interval = "1d",
+                group_by = "ticker",
+                auto_adjust = True,
+                prepost = True,
+                threads = True,
+                proxy = None
+        )
 
-def price_plot(symbol):
-        df = pd.DataFrame(data[symbol].Close)
-        df["Date"] = df.index
-        fig, ax = plt.subplots()
-        plt.fill_between(df.Date, df.Close, color="darkblue", alpha=0.3)
-        plt.plot(df.Date, df.Close, color="darkblue", alpha=0.8)
-        plt.xticks(rotation=90)
-        plt.title(symbol, fontweight="bold")
-        plt.xlabel("Date", fontweight="bold")
-        plt.ylabel("Closing Price", fontweight="bold")
-        st.pyplot(fig)
+        # Plot the closing price of the selected companies
 
-num_company = st.sidebar.slider("Number of Companies Stock Display", 1, 10)
+        def price_plot(symbol):
+                df = pd.DataFrame(data[symbol].Close)
+                df["Date"] = df.index
+                fig, ax = plt.subplots()
+                plt.fill_between(df.Date, df.Close, color="darkblue", alpha=0.3)
+                plt.plot(df.Date, df.Close, color="darkblue", alpha=0.8)
+                plt.xticks(rotation=90)
+                plt.title(symbol, fontweight="bold")
+                plt.xlabel("Date", fontweight="bold")
+                plt.ylabel("Closing Price", fontweight="bold")
+                st.pyplot(fig)
 
-if st.button("Show Plots"):
-        st.header("Stock Closing Price")
-        for i in list(df_selected_sector.Symbol)[:num_company]:
-            price_plot(i)
+        num_company = st.sidebar.slider("Number of Companies Stock Display", 1, 10)
+
+        if st.button("Show Plots"):
+                st.header("Stock Closing Price")
+                for i in list(df_selected_sector.Symbol)[:num_company]:
+                        price_plot(i)
+else:
+        st.markdown("### No Sectors Selected")
