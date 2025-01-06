@@ -4,6 +4,8 @@ config.py
 *checkpoints*
 *.pdf
 notes.txt
+*.xlsx
+*TX_GA*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
