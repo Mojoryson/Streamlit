@@ -64,7 +64,7 @@ if not df_selected_sector.empty:
         # Plot the closing price of the selected companies
 
         def price_plot(symbol):
-                df = pd.DataFrame(data[symbol].Close)
+                df = pd.DataFrame(data[symbol].Close) #type: ignore
                 df["Date"] = df.index
                 fig, ax = plt.subplots()
                 plt.fill_between(df.Date, df.Close, color="darkblue", alpha=0.3)
