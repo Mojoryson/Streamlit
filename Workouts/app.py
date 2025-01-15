@@ -105,14 +105,13 @@ else:
     # Class Frequency Bar Chart
     class_counts = filtered_df["class_name"].value_counts()
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""\n\n ### New School way to do a bar chart \n #### Class Frequency""")
+    st.markdown("""\n\n ### Streamlit Simple bar chart \n #### Class Frequency""")
                
     st.bar_chart(class_counts, horizontal=True, color="#fd0",
                      y_label="Class Type", x_label="Number of Sessions")
     
     with st.container():
         st.write("### Class Frequency")
-        st.write("The old school way to do a bar chart")
         #class_counts = filtered_df["class_name"].value_counts()
         fig, ax = plt.subplots()
         sns.barplot(x=class_counts.index, y=class_counts.values, palette="viridis", ax=ax)
@@ -135,7 +134,7 @@ else:
         filtered_df["year"] + " " + filtered_df["month"], format="%Y %B"
     )
     sessions_over_time = filtered_df.groupby("date").size()
-    st.markdown("""\n\n ### New School way to do a line chart \n #### Sessions Over Time""")
+    st.markdown("""\n\n ### Modern Streamlit Line Chart \n #### Sessions Over Time""")
     st.area_chart(sessions_over_time, color="#fd0", x_label="Date", y_label="Number of Sessions")
     
     with st.container():
@@ -147,7 +146,7 @@ else:
   
 
     # Heatmap for Popular Time of Day
-        # Ensure time_of_day is sorted properly
+    # Ensure time_of_day is sorted properly
     filtered_df = filtered_df.sort_values("time_of_day")
 
     st.markdown("""\n\n ### Modern Heatmap \n ***Using Altiar***""")
@@ -168,21 +167,35 @@ else:
     # Render heatmap in Streamlit
     st.altair_chart(heatmap, use_container_width=True)
     
+    # Create a container for the "Popular Time of Day" section
     with st.container():
         st.write("### Popular Time of Day")
+        
+        # Extract time from the "time_of_day" column and handle missing values
         filtered_df["time_of_day"] = filtered_df["time_of_day"].str.extract(r"(\d+:\d+\w+)").fillna("Unknown")
+        
+        # Count the occurrences of each time of day and sort the index
         time_counts = filtered_df["time_of_day"].value_counts().sort_index()
 
+        # Create a figure and axis for the heatmap
         fig, ax = plt.subplots()
+        
+        # Plot a heatmap of the time counts
         sns.heatmap(
-            [time_counts.values],
-            annot=True,
-            fmt="d",
-            cmap="Blues",
-            xticklabels=time_counts.index,
+            [time_counts.values],  # Data for the heatmap
+            annot=True,            # Annotate each cell with the numeric value
+            fmt="d",               # Format the annotations as integers
+            cmap="Blues",          # Color map for the heatmap
+            xticklabels=time_counts.index,  # Labels for the x-axis
         )
+        
+        # Set the title of the heatmap
         ax.set_title("Session Popularity by Time of Day", fontsize=12)
+        
+        # Rotate and format the x-axis labels
         ax.set_xticklabels(time_counts.index, rotation=30, ha="right", fontsize=9)
+        
+        # Display the heatmap in the Streamlit app
         st.pyplot(fig)
 
 
