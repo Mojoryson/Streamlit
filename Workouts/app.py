@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import textwrap
 from matplotlib.ticker import FuncFormatter
+import altair as alt
 
 # File Path
 file_path = "data/workout_history_cleaned.csv"
@@ -18,6 +19,7 @@ df["class_name"] = df["class_name"].fillna("Unknown")
 
 # Extract everything before 'w/ ' or similar patterns
 df['location'] = df['location'].str.extract(r"^(.*?)(?:, LLC\.| w/|$)")[0].str.strip()
+
 
 # Title and Description
 st.title("Workout Report and Visualizations")
@@ -100,6 +102,7 @@ else:
     # Class Frequency Bar Chart
     with st.container():
         st.write("### Class Frequency")
+        st.write("The hard way to do a bar chart")
         class_counts = filtered_df["class_name"].value_counts()
         fig, ax = plt.subplots()
         sns.barplot(x=class_counts.index, y=class_counts.values, palette="viridis", ax=ax)
@@ -116,6 +119,13 @@ else:
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x):,}"))
         ax.set_ylim(0, class_counts.max() * 1.1)
         st.pyplot(fig)
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+        
+    st.write("The easy way to do a bar chart")
+    st.bar_chart(class_counts, horizontal=True, color="#fd0",
+                     y_label="Class Type", x_label="Number of Sessions")
+        
 
     # Sessions Over Time Line Chart
     with st.container():
@@ -128,6 +138,10 @@ else:
         sessions_over_time.plot(ax=ax, title="Sessions Over Time", marker="o")
         ax.set_ylabel("Number of Sessions")
         st.pyplot(fig)
+     
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.write("The easy way to do a line chart")    
+    st.area_chart(sessions_over_time, color="#fd0", x_label="Date", y_label="Number of Sessions")
 
     # Heatmap for Popular Time of Day
     with st.container():
@@ -146,3 +160,28 @@ else:
         ax.set_title("Session Popularity by Time of Day", fontsize=12)
         ax.set_xticklabels(time_counts.index, rotation=30, ha="right", fontsize=9)
         st.pyplot(fig)
+
+
+    # Ensure time_of_day is sorted properly
+    filtered_df = filtered_df.sort_values("time_of_day")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    st.write("The easy way to do a heatmap")
+    # Altair Heatmap
+    heatmap = (
+        alt.Chart(filtered_df)
+        .mark_rect()
+        .encode(
+            x=alt.X("time_of_day:O", title="Time of Day"),
+            y=alt.Y("month:O", title="Month"),
+            color=alt.Color("count()", title="Number of Sessions"),
+            tooltip=["month", "time_of_day", "count()"],
+        )
+        .properties(title="Session Popularity by Time of Day and Month")
+        .interactive()
+    )
+    # Render heatmap in Streamlit
+    st.altair_chart(heatmap, use_container_width=True)
+
+st.markdown("© CodeRod Solutions LLC 2025")
