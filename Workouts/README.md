@@ -1,36 +1,40 @@
-# MindBody Workouts Analysis
+# Workout Report and Visualizations
 
-This project demonstrates how to extract and analyze workout class activity data from MindBody.com using BeautifulSoup, pandas, and matplotlib for reporting and analysis.
+This Streamlit app displays your workout history and visualizations based on data from Mindbody.com.
 
-## Overview
 
-The goal of this project is to analyze workout class data from MindBody.com. The analysis includes extracting data from HTML files, cleaning and preprocessing the data, and generating various visualizations to gain insights into the workout schedule.
+## Features
 
-## Tools and Libraries
+- Display workout history
+- Visualize workout data
+- Filter workouts by class name and date range
 
-- **BeautifulSoup**: For parsing HTML and extracting data.
-- **pandas**: For data manipulation and analysis.
-- **matplotlib**: For creating visualizations.
+## Usage
 
-## Data Extraction
+1. Run the Streamlit app:
+    ```bash
+    streamlit run app.py
+    ```
 
-The data is extracted from HTML files using BeautifulSoup. The relevant information such as day, month, year, category, class name, location, time of day, and duration is extracted and stored in a pandas DataFrame.
+2. Open your web browser and go to `http://localhost:8501` to view the app.
 
-## Data Cleaning and Preprocessing
+## Data Preparation
 
 The extracted data is cleaned and preprocessed to ensure it is in a suitable format for analysis. This includes:
-- Splitting the `month_year` column into separate `month` and `year` columns.
-- Converting the `day` column to numeric.
-- Converting the `time_of_day` column to datetime.
-- Converting the `duration` column to timedelta.
-- Handling missing values in the `class_name` and `time_of_day` columns.
+- Converting the `time_of_day` column to string and handling missing values.
+- Converting the `month` and `year` columns to string.
+- Handling missing values in the `class_name` column.
+- Extracting the location from the `location` column.
 
-## Visualizations
+## Feature Building
 
+The following features are built to enhance the analysis:
 - **Number of Classes per Year**: A bar chart showing the number of classes each year.
+- **Class Distribution by Time of Day**: A visualization showing the distribution of classes throughout the day.
+- **Class Attendance Trends**: Analysis of attendance trends over time.
 
-## Conclusion
+## Contributing
 
-This project provides a comprehensive analysis of workout class data from MindBody.com. By extracting, cleaning, and visualizing the data, we can gain valuable insights into the workout schedule and class distribution.
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-Feel free to explore the notebook and modify the analysis as needed. If you have any questions or suggestions, please open an issue or submit a pull request.
+&copy; CodeRod Solutions LLC
