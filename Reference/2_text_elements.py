@@ -4,10 +4,11 @@ import streamlit as st
 
 
 # st.title("Text Elements in Streamlit")
-st.title("Text Elements in Streamlit")
+st.title("Text Elements in Streamlit :smiley:")  # Title with an emoji
+st.write(" For icons on MacOS: Press Command + Control + Spacebar to open the emoji picker.")
 
 # st.header("Header")
-st.header("This is a Header")
+st.header("This is a Header 🎉")
 
 # st.subheader("Subheader")
 st.subheader("This is a Subheader")
