@@ -6,6 +6,7 @@ config.py
 notes.txt
 *.xlsx
 *TX_GA*
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
