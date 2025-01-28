@@ -21,8 +21,53 @@ from dotenv import load_dotenv
 load_dotenv()
 HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
 
-
-
+def process_input(input_type, input_data):
+    """ Process the input data based upon the input type & create the vector store"""
+    loader = None
+    if input_type == "Web":
+        loader = WebBaseLoader(input_data)
+        documents = loader.load()
+    elif input_type == "PDF":
+        if isinstance(input_data, BytesIO):
+            pdf_reader = PdfReader(input_data)
+        elif isinstance(input_data, UploadedFile):
+            pdf_reader = PdfReader(BytesIO(input_data.read()))
+        else:
+            st.error("Invalid PDF file")
+            raise ValueError("Invalid PDF file")
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+        documents = text
+    elif input_type == "DOCX":
+        if isinstance(input_data, BytesIO):
+            doc = Document(input_data)
+        elif isinstance(input_data, UploadedFile):
+            doc = Document(BytesIO(input_data.read()))
+        else:
+            st.error("Invalid DOCX file")
+            raise ValueError("Invalid DOCX file")
+        text = "\n".join([para.text for para in doc.paragraphs])
+        documents = text
+    elif input_type == "Text":
+        if isinstance(input_data, str):
+            documents = input_data
+        else:
+            st.error("Invalid text input")
+            raise ValueError("Invalid text input")
+    elif input_type == "TXT":
+        if isinstance(input_data, BytesIO):
+            text = input_data.read().decode("utf-8")
+        elif isinstance(input_data, UploadedFile):
+            text = str(input_data.read(), "utf-8")
+        else:
+            st.error("Invalid TXT file")
+            raise ValueError("Invalid TXT file")
+        documents = text
+    else:
+        st.error("Invalid input type")
+        raise ValueError("Invalid input type")
+    
 
 def main():
     st.set_page_config(page_title="RAG App", page_icon=":books:")
