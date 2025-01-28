@@ -15,12 +15,15 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_huggingface import HuggingFaceEndpoint
 from dotenv import load_dotenv
 
+# st.page config
+st.set_page_config(page_title="40-Tech RAG Q&A App", page_icon="🤖")
 
 
 # Import the Hugging Face API key
 load_dotenv()
 HUGGING_FACE_API = os.getenv("HUGGING_FACE_API")
 
+# Function to process the input data
 def process_input(input_type, input_data):
     """ Process the input data based upon the input type & create the vector store"""
     loader = None
@@ -68,9 +71,55 @@ def process_input(input_type, input_data):
         st.error("Invalid input type")
         raise ValueError("Invalid input type")
     
+    # Split the documents into chunks
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    if input_type == "Web":
+        texts = text_splitter.split_documents(documents)
+        texts = [str(doc.page_content) for doc in texts]
+    else:
+        texts = text_splitter.split_text(documents)
+        
+    # Create the embeddings
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    
+    hf_embeddings = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
+    # Create FAISS index
+    sample_embedding = np.array(hf_embeddings.embed_query("sample text"))
+    dimension = sample_embedding.shape[0]
+    index = faiss.IndexFlatL2(dimension)
+    
+    # Create FAISS vector store with the embedding function
+    vector_store = FAISS(
+        embedding_function=hf_embeddings,
+        index=index,
+        docstore=InMemoryDocstore(),
+        index_to_docstore_id={},
+    )
+    vector_store.add_texts(texts)  # Add documents to the vector store
+    return vector_store
+    
+
+def answer_question(vectorstore, query):
+    """Answers a question based on the provided vectorstore."""
+    llm = HuggingFaceEndpoint(repo_id= "meta-llama/Meta-Llama-3-8B-Instruct", 
+                              api_key = HUGGING_FACE_API, 
+                              temperature= 0.5
+                              )
+    
+    qa = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever())
+
+    answer = qa({"query": query})
+    return answer
+
+
 
 def main():
-    st.set_page_config(page_title="RAG App", page_icon=":books:")
     st.title("40-Tech RAG Q&A App 🚀")
     
     input_type = st.selectbox("Select a source", ["Web", "PDF", "DOCX", "Text", "TXT"])
@@ -92,8 +141,15 @@ def main():
         st.error("Please select a valid source")
         return
 
-    if st.button("Submit"):
-        pass
+    if st.button("Process"):
+        # st.write(process_input(input_type, input_data))
+        vectorstore = process_input(input_type, input_data)
+        st.session_state["vectorstore"] = vectorstore
+    if "vectorstore" in st.session_state:
+        query = st.text_input("Ask your question")
+        if st.button("Submit"):
+            answer = answer_question(st.session_state["vectorstore"], query)
+            st.write(answer)
 
 
 if __name__ == "__main__":
